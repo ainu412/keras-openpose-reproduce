@@ -21,6 +21,16 @@ import os
 import os.path
 import pandas
 
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
+
 # orderCOCO = [1,0, 7,9,11, 6,8,10, 13,15,17, 12,14,16, 3,2,5,4]
 orderCOCO = [0,1, 15,14,17,16, 5,2,6,3,7,4, 11,8,12,9,13,10]
 
@@ -443,7 +453,8 @@ def process_single_scale (input_image, model, params, model_params):
     return canvas, candidate, subset
 
 
-def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, eval_method, epoch_num):
+def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, eval_method, epoch_num,
+                      fir_img_num):
     # load model
     model = get_testing_model()
     model.load_weights(model_weights_file)
@@ -453,7 +464,7 @@ def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, 
     # load epoch num
     trained_epoch = epoch_num
     # load validation image ids
-    imgIds = sorted(cocoGt.getImgIds())
+    imgIds = sorted(cocoGt.getImgIds()[:fir_img_num]) ## original
 
     # eval model
     mode_name = ''
@@ -468,7 +479,7 @@ def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, 
     if not os.path.exists('./results'):
         os.mkdir('./results')
 
-    output_folder = './results/val2014-ours-epoch%d-%s'%(trained_epoch,mode_name)
+    output_folder = './results/val2014-ours-epoch%d-%s-%s'%(trained_epoch,mode_name,fir_img_num)
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
@@ -509,6 +520,7 @@ def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, 
 
     # dump results to json file
     write_json(candidate_set, subset_set, image_id_set, json_file)
+
     return json_fpath
 
 def write_json(candidate_set, subset_set, image_id_set, json_file):
@@ -545,16 +557,83 @@ def write_json(candidate_set, subset_set, image_id_set, json_file):
                 score = subset_set[i][person][-2]
                 json_dict = {"image_id":image_id_set[i], "category_id":category_id, "keypoints": keypoints,"score":score}             
                 output_data.append(json_dict)
-        json.dump(output_data,outfile)
+        json.dump(output_data,outfile,cls=NpEncoder)
 
-def run_eval_metric(cocoGt, prediction_json, total_time, full_eval):
+def check_pred_keypoints(pred_keypoint, gt_keypoint, threshold, normalize):
+    def get_normalize(input_shape):
+        """
+        rescale keypoint distance normalize coefficient
+        based on input shape, used for PCK evaluation
+        NOTE: 6.4 is standard normalize coefficient under
+              input shape (256,256)
+        # Arguments
+            input_shape: input image shape as (height, width)
+        # Returns
+            scale: normalize coefficient
+        """
+        # assert input_shape[0] == input_shape[1], 'only support square input shape.'
+
+        # use averaged scale factor for non square input shape
+        scale = float((input_shape[0] + input_shape[1]) / 2) / 256.0
+
+        return 6.4 * scale
+    # head bone length = abs(gt_Rear - gt_Lear)
+    # normalize =
+
+    # check if ground truth keypoint is valid
+    if gt_keypoint[0] > 1 and gt_keypoint[1] > 1:
+        # calculate normalized euclidean distance between pred and gt keypoints
+        distance = np.linalg.norm(gt_keypoint[0:2] - pred_keypoint[0:2]) / normalize
+        if distance < threshold:
+            # succeed prediction
+            return 1
+        else:
+            # fail prediction
+            return 0
+    else:
+        # invalid gt keypoint
+        return -1
+def calPCK(pred_path, ann_path, threshold=0.5):
+    with open(pred_path, 'r') as f:
+        pred = json.load(f)
+    with open(ann_path, 'r') as f:
+        ann = json.load(f)['annotations']
+
+    true_cnt = 0
+    total_cnt = 0
+    for dt in pred:
+        left_ear_visibility_index = -4
+        right_ear_visibility_index = -1
+        if dt['gtId'] == 0:
+            continue
+        gt = [a for a in ann if a['id'] == dt['gtId']][0]
+        if not gt['keypoints'][left_ear_visibility_index] or not gt['keypoints'][right_ear_visibility_index]:
+            continue
+        total_cnt += 1
+
+        # left and right ear both labelled, then
+        def euclidean_dist_2d(x1,x2,y1,y2):
+            return np.sqrt((x1 - x2) ** 2 +  (y1 - y2) ** 2)
+
+        head_bone_link_length = euclidean_dist_2d(gt['keypoints'][-2], gt['keypoints'][-5],
+                                                  gt['keypoints'][-3], gt['keypoints'][-6])
+        dtks = np.array(dt['keypoints']).reshape(-1, 3)
+        gtks = np.array(gt['keypoints']).reshape(-1, 3)
+        for (dt_x, dt_y, dt_v), (gt_x, gt_y, gt_v) in zip(dtks, gtks):
+            if gt_v != 0 or dt_v != 0:
+                total_cnt += 1
+                if euclidean_dist_2d(dt_x, gt_x, dt_y, gt_y) < threshold * head_bone_link_length:
+                    true_cnt += 1
+    return true_cnt / total_cnt
+
+def run_eval_metric(cocoGt, prediction_json, total_time, full_eval, fir_img_num):
     #initialize COCO detections api
     annType = 'keypoints'
     cocoDt = cocoGt.loadRes(prediction_json)
     # running evaluation
     cocoEval = COCOeval(cocoGt,cocoDt,annType)
     # load validation image ids
-    imgIds = sorted(cocoGt.getImgIds())
+    imgIds = sorted(cocoGt.getImgIds()[:fir_img_num])
     out_prefix = 'full'
     if full_eval==False:
         out_prefix = '1k'
@@ -562,6 +641,7 @@ def run_eval_metric(cocoGt, prediction_json, total_time, full_eval):
 
     cocoEval.params.imgIds = imgIds
     cocoEval.evaluate()
+    print('[[evalImgs kankan id is what?', cocoEval.evalImgs)
     cocoEval.accumulate()
     cocoEval.summarize()
    
@@ -572,6 +652,20 @@ def run_eval_metric(cocoGt, prediction_json, total_time, full_eval):
     outputs = np.append(scores,total_time)
     np.savetxt(acc_file,outputs,delimiter=',')
 
+    dtIds_all = [a - 1 for dic in cocoEval.evalImgs for a in dic['dtIds']]
+    dtIds_match_gtIds = [int(a) for dic in cocoEval.evalImgs for a in dic['dtMatches'][0]] # 0 means IoU>0.5 then match
+    dt_gt_dic = {}
+    for dtId, gtId in zip(dtIds_all, dtIds_match_gtIds):
+        dt_gt_dic[dtId] = gtId
+
+    with open(prediction_json) as f:
+        pred_data = json.load(f)
+        for dtId in range(len(pred_data)):
+            pred_data[dtId]['gtId'] = dt_gt_dic[dtId]
+        pred_matchGtId_path = prediction_json[:-5] + '_matchGtId.json'
+        with open(pred_matchGtId_path, 'w') as final:
+            json.dump(pred_data, final, cls=NpEncoder)
+    return pred_matchGtId_path
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -582,6 +676,7 @@ if __name__ == '__main__':
     parser.add_argument('--coco_dataType', type=str, default='val2014', help='val2017 or val2014')
     parser.add_argument('--coco_api_dir', type=str, default='../dataset/cocoapi', help='path to coco api')
     parser.add_argument('--eval_method', type=int, default=0, help='open-pose-single-scale: 0, open-pose-multi-scale: 1')
+    parser.add_argument('--fir_img_num', type=int, default=5, help='validate on first ? images')
 
     args = parser.parse_args()
     keras_weights_file = args.model
@@ -596,14 +691,17 @@ if __name__ == '__main__':
     cocoGt = COCO(annFile)
     tic = time.time()
     print('start processing...')
-    json_path = compute_keypoints(keras_weights_file, cocoGt, args.coco_api_dir, args.coco_dataType, args.eval_method, epoch_num)
+    json_path = compute_keypoints(keras_weights_file, cocoGt, args.coco_api_dir, args.coco_dataType, args.eval_method,
+                                  epoch_num, args.fir_img_num)
     toc = time.time()
     total_time = toc - tic
     print ('overall processing time is %.5f' % (toc - tic))
 
     # run coco eval 2014
-    run_eval_metric(cocoGt, json_path, total_time, full_eval=True)
+    pred_path = run_eval_metric(cocoGt, json_path, total_time, full_eval=True, fir_img_num=args.fir_img_num)
     # run coco eval 2014 (1k images random selected by CMU)
-    run_eval_metric(cocoGt, json_path, total_time, full_eval=False)
+    # run_eval_metric(cocoGt, json_path, total_time, full_eval=False)
+
+    print('PCK@0.5=', calPCK(pred_path, annFile))
 
 

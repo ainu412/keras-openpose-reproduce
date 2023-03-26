@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 CAFFE_LAYERS_DIR = "model/caffe/layers"
-KERAS_MODEL_FILE = "model/keras/model.h5"
+KERAS_MODEL_FILE = "model/keras/weights.0100.h5"
 
 m = get_testing_model()
 

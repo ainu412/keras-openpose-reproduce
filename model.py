@@ -1,9 +1,10 @@
 from keras.models import Model
-from keras.layers.merge import Concatenate
+# from keras.layers.merge import Concatenate
+from keras.layers import concatenate
 from keras.layers import Activation, Input, Lambda
 from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D
-from keras.layers.merge import Multiply
+from keras.layers import Multiply
 from keras.regularizers import l2
 from keras.initializers import random_normal, constant
 
@@ -144,7 +145,7 @@ def get_training_model(weight_decay, gpus=None):
     stage1_branch2_out = stage1_block(stage0_out, np_branch2, 2, weight_decay)
     w2 = apply_mask(stage1_branch2_out, vec_weight_input, heat_weight_input, np_branch2, 1, 2)
 
-    x = Concatenate()([stage1_branch1_out, stage1_branch2_out, stage0_out])
+    x = concatenate([stage1_branch1_out, stage1_branch2_out, stage0_out])
 
     outputs.append(w1)
     outputs.append(w2)
@@ -163,7 +164,7 @@ def get_training_model(weight_decay, gpus=None):
         outputs.append(w2)
 
         if (sn < stages):
-            x = Concatenate()([stageT_branch1_out, stageT_branch2_out, stage0_out])
+            x = concatenate([stageT_branch1_out, stageT_branch2_out, stage0_out])
 
     if gpus is None:
         model = Model(inputs=inputs, outputs=outputs)
@@ -193,7 +194,7 @@ def get_testing_model():
     # stage 1 - branch 2 (confidence maps)
     stage1_branch2_out = stage1_block(stage0_out, np_branch2, 2, None)
 
-    x = Concatenate()([stage1_branch1_out, stage1_branch2_out, stage0_out])
+    x = concatenate([stage1_branch1_out, stage1_branch2_out, stage0_out])
 
     # stage t >= 2
     stageT_branch1_out = None
@@ -203,7 +204,7 @@ def get_testing_model():
         stageT_branch2_out = stageT_block(x, np_branch2, sn, 2, None)
 
         if (sn < stages):
-            x = Concatenate()([stageT_branch1_out, stageT_branch2_out, stage0_out])
+            x = concatenate([stageT_branch1_out, stageT_branch2_out, stage0_out])
 
     model = Model(inputs=[img_input], outputs=[stageT_branch1_out, stageT_branch2_out])
 
