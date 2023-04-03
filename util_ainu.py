@@ -7,6 +7,8 @@ import math
 import cv2
 import copy
 import numpy as np
+from PIL import Image, ImageEnhance
+
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -105,6 +107,22 @@ def motion_blur_dataset():
         # cv2.imwrite('car_vertical.jpg', vertical_mb)
         cv2.imwrite('dataset/val2014_random1k_motion_blur/' + name, horizonal_mb)
 
+def dark_dataset():
+    dir = 'dataset/val2014_random1k/'
+    fileNames = os.listdir(dir)
+    tar_dir = 'dataset/val2014_random1k_dark/'
+    os.mkdir(tar_dir)
+    for name in fileNames:
+        # read the image
+        img = Image.open(dir + name)
+
+        # image brightness enhancer
+        enhancer = ImageEnhance.Brightness(img)
+
+        factor = 0.5  # darkens the image
+        img_output = enhancer.enhance(factor)
+        img_output.save(tar_dir + name)
+
 if __name__ == '__main__':
     # val 2014的所有文件中随机选1000个存到另一个文件夹中去
     # copyFile('dataset/val2014/', 'dataset/val2014_random1k/')
@@ -116,10 +134,13 @@ if __name__ == '__main__':
 
     # half_resolution_dataset_annotation()
     # motion_blur_dataset()
-    dir = 'dataset/val2014_random1k/'
-    fileNames = os.listdir(dir)
-    # open file in write mode
-    with open('dataset/val2014_random1k_motion_blur.txt', 'w') as fp:
-        for item in fileNames:
-            # write each item on a new line
-            fp.write("%s\n" % int(item[13:-4]))
+    # dir = 'dataset/val2014_random1k/'
+    # fileNames = os.listdir(dir)
+    # # open file in write mode
+    # with open('dataset/val2014_random1k_motion_blur_imgid.txt', 'w') as fp:
+    #     for item in fileNames:
+    #         # write each item on a new line
+    #         fp.write("%s\n" % int(item[13:-4]))
+    dark_dataset()
+
+

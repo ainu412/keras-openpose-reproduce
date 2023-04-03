@@ -15,7 +15,7 @@ import keras.backend as K
 
 from glob import glob
 
-batch_size = 10
+batch_size = 16
 base_lr = 2e-5
 momentum = 0.9
 weight_decay = 5e-4

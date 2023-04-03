@@ -739,12 +739,13 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default=model_file, help='path to the weights file')
     parser.add_argument('--outputjson', type=str, default='val2014_result.json',
                         help='path to the json file for coco eval')
-    parser.add_argument('--coco_dataType', type=str, default='val2014_random1k_motion_blur',
-                        help='val2014 or val2014_random1k_resolution or val2014_random1k_motion_blur')
+    parser.add_argument('--coco_dataType', type=str, default='val2014_random1k_dark',
+                        help='val2014 or val2014_random1k_resolution or val2014_random1k_motion_blur'
+                             'or val2014_random1k_dark')
     parser.add_argument('--coco_api_dir', type=str, default='../dataset/cocoapi', help='path to coco api')
     parser.add_argument('--eval_method', type=int, default=0,
                         help='open-pose-single-scale: 0, open-pose-multi-scale: 1')
-    parser.add_argument('--fir_img_num', type=int, default=1000, help='validate on first __ images,'
+    parser.add_argument('--fir_img_num', type=int, default=10, help='validate on first __ images,'
                                                                     'if <0 means all images')
     # parser.add_argument('--disable_output_keypoint_img', type=bool, default=True)
     parser.add_argument('--compute_keypoint', type=bool, default=True, help='let model predict keypoint or not')
@@ -778,10 +779,10 @@ if __name__ == '__main__':
 
                 # add current item to the list
                 img_id.append(int(x[14:-4]))
-    if args.coco_dataType == 'val2014_random1k_motion_blur':
+    if args.coco_dataType == 'val2014_random1k_motion_blur' or args.coco_dataType == 'val2014_random1k_dark':
         img_id = []
         # open file and read the content in a list
-        with open('../dataset/' + args.coco_dataType + '.txt', 'r') as fp:
+        with open('../dataset/' + args.coco_dataType + '_imgid.txt', 'r') as fp:
             for line in fp:
                 # remove linebreak from a current name
                 # linebreak is the last character of each line
