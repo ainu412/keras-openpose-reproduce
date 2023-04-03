@@ -462,7 +462,6 @@ def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, 
     # load model
     model = get_testing_model()
     model.load_weights(model_weights_file)
-    model.save_weights(model_weights_file[:-3] + 'newly_saved.h5')
     # load model config
     params, model_params = config_reader()
 
@@ -470,7 +469,11 @@ def compute_keypoints(model_weights_file, cocoGt, coco_api_dir, coco_data_type, 
     trained_epoch = epoch_num
     # load validation image ids
     if img_id is not None:
-        imgIds = img_id
+        ### TO change
+        if fir_img_num != -1:
+            imgIds = img_id[:fir_img_num]
+        else:
+            imgIds = img_id
     elif fir_img_num > 0:
         imgIds = sorted(cocoGt.getImgIds()[:fir_img_num])  ## original
     else:
@@ -741,7 +744,7 @@ if __name__ == '__main__':
     parser.add_argument('--coco_api_dir', type=str, default='../dataset/cocoapi', help='path to coco api')
     parser.add_argument('--eval_method', type=int, default=0,
                         help='open-pose-single-scale: 0, open-pose-multi-scale: 1')
-    parser.add_argument('--fir_img_num', type=int, default=-1, help='validate on first __ images,'
+    parser.add_argument('--fir_img_num', type=int, default=1000, help='validate on first __ images,'
                                                                     'if <0 means all images')
     # parser.add_argument('--disable_output_keypoint_img', type=bool, default=True)
     parser.add_argument('--compute_keypoint', type=bool, default=True, help='let model predict keypoint or not')
