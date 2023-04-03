@@ -1,0 +1,14 @@
+,evaluation_metrics,value
+0,(AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ],0.512198968063984
+1,(AP) @[ IoU=0.50      | area=   all | maxDets= 20 ],0.7581329561527581
+2,(AP) @[ IoU=0.75      | area=   all | maxDets= 20 ],0.5108719457004128
+3,(AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ],0.460525464311137
+4,(AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ],0.5826438477733353
+5,(AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ],0.553968253968254
+6,(AR) @[ IoU=0.50      | area=   all | maxDets= 20 ],0.7619047619047619
+7,(AR) @[ IoU=0.75      | area=   all | maxDets= 20 ],0.5555555555555556
+8,(AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ],0.4685714285714286
+9,(AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ],0.6607142857142857
+10,prediction time,209.31510400772095
+11,PCK@0.5 all keypoints,0.8961038961038961
+12,PCK@0.9 invisible keypoints,0.0

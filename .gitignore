@@ -5,3 +5,8 @@
 *.h5
 *.txt
 *.json
+eval/results/.DS_Store
+eval/results/.DS_Store
+eval/results/val2014-ours-epoch100-open-pose-single-scale--1--alllll/.DS_Store
+eval/results/val2014_random1k_motion_blur-ours-epoch100-open-pose-single-scale--1/.DS_Store
+training/.DS_Store

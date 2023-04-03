@@ -1,0 +1,16 @@
+,evaluation_metrics,value
+0,(AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ],0.34822482248224823
+1,(AP) @[ IoU=0.50      | area=   all | maxDets= 20 ],0.45814581458145814
+2,(AP) @[ IoU=0.75      | area=   all | maxDets= 20 ],0.37513751375137516
+3,(AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ],0.10297029702970292
+4,(AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ],0.4950825082508251
+5,(AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ],0.3619047619047619
+6,(AR) @[ IoU=0.50      | area=   all | maxDets= 20 ],0.47619047619047616
+7,(AR) @[ IoU=0.75      | area=   all | maxDets= 20 ],0.38095238095238093
+8,(AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ],0.1
+9,(AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ],0.5230769230769231
+10,prediction time,37.954708099365234
+11,PCK@0.5 all keypoints,0.8717948717948718
+12,PCK@0.9 invisible keypoints,0.0
+13,PCK@0.5 difficult keypoints,0.8
+14,PCK@0.5 crowded images,0.9411764705882353
