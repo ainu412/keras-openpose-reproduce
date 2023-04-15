@@ -9,16 +9,21 @@ import os.path
 import struct
 import h5py
 import json
+import argparse
 
 dataset_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'dataset'))
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--effect', type=str, default='', help='_dark or _motion_blur')
+args = parser.parse_args()
+
 tr_anno_path = os.path.join(dataset_dir, "annotations/person_keypoints_train2014.json")
-tr_img_dir = os.path.join(dataset_dir, "train2014")
-tr_mask_dir = os.path.join(dataset_dir, "trainmask2014")
+tr_img_dir = os.path.join(dataset_dir, "train2014" + args.effect)
+tr_mask_dir = os.path.join(dataset_dir, "trainmask2014" + args.effect)
 
 val_anno_path = os.path.join(dataset_dir, "annotations/person_keypoints_val2014.json")
-val_img_dir = os.path.join(dataset_dir, "val2014")
-val_mask_dir = os.path.join(dataset_dir, "valmask2014")
+val_img_dir = os.path.join(dataset_dir, "val2014" + args.effect)
+val_mask_dir = os.path.join(dataset_dir, "valmask2014" + args.effect)
 
 datasets = [
     (val_anno_path, val_img_dir, val_mask_dir, "COCO_val", "val"),  # it is important to have 'val' in validation dataset name, look for 'val' below
@@ -27,8 +32,8 @@ datasets = [
 
 
 joint_all = []
-tr_hdf5_path = os.path.join(dataset_dir, "train_dataset_2014.h5")
-val_hdf5_path = os.path.join(dataset_dir, "val_dataset_2014.h5")
+tr_hdf5_path = os.path.join(dataset_dir, "train_dataset_2014%s.h5" % args.effect)
+val_hdf5_path = os.path.join(dataset_dir, "val_dataset_2014%s.h5" % args.effect)
 
 val_size = 2645 # size of validation set
 

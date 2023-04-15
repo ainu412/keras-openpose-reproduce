@@ -51,7 +51,8 @@ class RawDataIterator:
 
         meta = json.loads(entry.attrs['meta'])
         meta['joints'] = RmpeCocoConfig.convert(np.array(meta['joints']))
-        data = entry.value
+        data = entry[()]
+        # data = entry.value
 
         if data.shape[0] <= 6:
             # TODO: this is extra work, should write in store in correct format (not transposed)

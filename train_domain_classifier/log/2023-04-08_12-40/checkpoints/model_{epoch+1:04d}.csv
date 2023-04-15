@@ -1,0 +1,3 @@
+,evaluation_metrics,value
+0,valid set avg_loss,0.5562810641010717
+1,valid set avg_acc,0.995

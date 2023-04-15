@@ -46,7 +46,7 @@ def peak_binary_map(hmap, threshold=0.1):
 
 # load model
 print('start processing...')
-keras_weights_file = './training/weights/weights.0100.h5'
+keras_weights_file = 'training/weights/weights.0100.h5'
 keras_dat_file = 'my_model_epoch100.dat'
 output_fld = 'tensorflow_model/'
 num_output = 3

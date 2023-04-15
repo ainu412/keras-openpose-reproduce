@@ -1,6 +1,6 @@
 # keras-openpose-reproduce
 
-This is a keras implementation of [Realtime Multi-Person Pose Estimation](https://github.com/ZheC/Realtime_Multi-Person_Pose_Estimation).
+This is a keras implementation of [Realtime Multi-Person Pose Estimation](https://github.com/ZheC/Realtime_Multi-Person_Pose_Estimation) and [DOPE-Uncertainty](https://github.com/NVlabs/DOPE-Uncertainty).
 
 
 ## Prerequisites
@@ -12,8 +12,8 @@ This is a keras implementation of [Realtime Multi-Person Pose Estimation](https:
 
 Please also install the following packages:
 
-    $ sudo apt-get install libboost-all-dev libhdf5-serial-dev libzmq3-dev libopencv-dev python-opencv python3-tk python-imaging
-    $ sudo pip3 install Cython scikit-image pandas zmq h5py opencv-python IPython configobj
+    $ pip install libboost-all-dev libhdf5-serial-dev libzmq3-dev libopencv-dev python-opencv python3-tk python-imaging
+    $ pip install Cython scikit-image pandas zmq h5py opencv-python IPython configobj
 
 
 ## Download COCO 2014 Dataset
@@ -35,55 +35,119 @@ Before model training, we convert the images to the specific data format for eff
 
 After this, you will generate `train_dataset_2014.h5` and `val_dataset_2014.h5`. The files are about `182GB` and `3.8GB`, respectively.
 
-## Training
+## Training of Human Pose Keypoints Detector
 
-Simply go to folder `training` and run the training script:
+train Human Pose Keypoints Detector in three domains seperately
 
     $ cd training
-    $ python3 train_pose.py
+    # train original model
+    $ python train_pose.py --effect ""
+    # train dark domain model
+    $ python train_pose.py --effect _dark
+    # train motion blur domain model
+    $ python train_pose.py --effect _motion_blur
+
+You can find our trained models at [Dropbox](https://www.dropbox.com/sh/k0yh5efafzzgvy9/AAB3OWBxq38JBIPXe3wBz3KXa?dl=0)
+
+## Training, Validation, and Prediction of Domain Classifier
+
+Train Domain Classifier to identify between three kinds of images: normal image, dark image (image with low lightning), and motion blur image (image with high degree of motion blur)
+
+```
+$ cd train_domain_classifier
+# train model and save to 'train_domain_classifier/log/2023-04-08_12-40/checkpoints/model_{epoch+1:04d}.pth'
+$ python train.py
+$ python validate.py
+```
+
+validation set loss: 0.556 | validation set accuracy: 99.5%
+
+You can find our trained model at [Dropbox](https://www.dropbox.com/sh/247969lxme1dzrp/AABh5kW3AXL2mcU_8LZh4U8Aa?dl=0)
 
 
-## Evaluation on COCO Keypoint Datasets
 
-Please go to folder `eval` and run the evaluation script. `eval_model=0`: single-scale evaluation. `eval_model=1`: multi-scale evaluation (as described in Openpose's paper).
+Predict and save the predicted domain to `train_domain_classifier/results/val2014_random1k_resolution.json` file
 
+```
+# predict image domain with our trained model on val2014_random1k_resolution dataset
+$ cd train_domain_classifier
+$ python ensemble.py --coco_dataType val2014_random1k_resolution
+```
+
+parameter:
+
+ `--coco_dataType`: dataset domain
+
+Range: `"val2014_random1k", "val2014_random1k_dark", "val2014_random1k_motion_blur", "val2014_random1k_resolution"`
+
+## Evaluation on COCO Keypoints Datasets
+
+Only implement openpose single scale for fast development
+
+    # predict keypoints and evaluate predicted results origianl model on first 100 images of dark validation dataset
     $ cd eval
-    $ python3 eval_coco2014_multi_modes.py --eval_method 0
-    $ python3 eval_coco2014_multi_modes.py --eval_method 1
+    $ python eval_coco2014_single_scale.py --effect "" --coco_dataType val2014_random1k_dark --fir_img_num 100
+    
+    # predict keypoints and evaluate predicted results dark model on first 1000 images of low resolution validation dataset
+    $ python eval_coco2014_single_scale.py --effect _dark --coco_dataType val2014_random1k_resolution --fir_img_num 1000
+
+parameters:
+
+1. `--effect`: specifies neural network type
+
+​		Range: `"", "_dark", "_motion_blur", "_ensemble"`
+
+2.  `--coco_dataType`: dataset domain
+
+   Range: `"val2014_random1k", "val2014_random1k_dark", "val2014_random1k_motion_blur", "val2014_random1k_resolution"`
+
+3. `--fir_img_num`: , evaluate on first __ number of images
+
+   Range: `∈[1, 1000]`
+
+4. `--compute keypoint`
+
+​		Range: `True, False`
+
+5. `--eval_compute_keypoint`
+
+​		Range: `True, False`
+
+## Evaluate on three models' uncertainty quantification
+
+Compute three models' uncertainty quantification -- translational and rotational disagreement, and save the results to `eval/results/%s-three-model-epoch100-open-pose-single-scale-1000.csv' % args.coco_dataType` file
+
+```
+$ python util_ainu.py --coco_dataType val2014_random1k_resolution
+```
+
+parameter:
+
+ `--coco_dataType`: dataset domain
+
+Range: `"val2014_random1k", "val2014_random1k_dark", "val2014_random1k_motion_blur", "val2014_random1k_resolution"`
 
 
-## Evaluation Summary
+## Evaluation of Ensemble of Networks on COCO Keypoints Datasets
 
-We empirically trained the model for `100 epochs (2 weeks)` and achieved comparable performance to the results reported in the original paper. We also compared with the original implementation which is [online avialable](https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation#converting-caffe-model-to-keras-model). Note that the validation list `COCO2014-Val-1K` is provided by [the official Openpose](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose/blob/master/image_info_val2014_1k.txt).
+```
+# compute ensemble prediction results on val2014_random1k_resolution COCO keypoints dataset
+$ cd train_expert_classifier
+$ python ensemble.py --coco_dataType val2014_random1k_resolution
 
+# evaluate ensemble results on val2014_random1k_resolution COCO keypoints dataset
+$ cd ../eval
+$ python eval_coco2014_single_scale.py --effect _ensemble --coco_dataType val2014_random1k_resolution --fir_img_num 1000 --compute_keypoint False --eval_compute_keypoint True
+```
 
-|     Method      |      Validation       |     AP    | 
-|-----------------|:---------------------:|:---------:|
-|  [Openpose paper](https://arxiv.org/pdf/1611.08050.pdf) |  COCO2014-Val-1k   |    58.4   | 
-|  [Openpose model](https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation#converting-caffe-model-to-keras-model) |    COCO2014-Val-1k    |    56.3   |     
-|    This repo    |    COCO2014-Val-1k    |    58.2   |
-
-
-We also evaluated the performance on the full COCO2014 validation set.
-
-|     Method      |      Validation       |     AP    | 
-|-----------------|:---------------------:|:---------:|  
-|  [Openpose model](https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation#converting-caffe-model-to-keras-model) |      COCO2014-Val     |    58.9   |    
-|    This repo    |      COCO2014-Val     |    59.0   |   
-
-
-You may find our trained model at: [Dropbox](https://www.dropbox.com/s/76b3r8rj82wicik/weights.0100.h5?dl=0)
-
-You may also find our prediction results on COCO2014 validation (json format w/o images): [Dropbox](https://www.dropbox.com/s/snaot6xva6ei5ge/val2014_ours_result.json?dl=0)
-
+You may find prediction results at [Dropbox](https://www.dropbox.com/sh/mt52o9rqi5ggyn1/AAC2oxGVPbVimvMF-zmkdM6Ea?dl=0)
 
 ## Acknowledgment
-This repo is based upon [@anatolix](https://github.com/anatolix)'s repo [keras_Realtime_Multi-Person_Pose_Estimation](https://github.com/anatolix/keras_Realtime_Multi-Person_Pose_Estimation), and [@michalfaber](https://github.com/michalfaber)'s repo [keras_Realtime_Multi-Person_Pose_Estimation](https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation)
+
+This repo is based upon  [kevinlin311tw](https://github.com/kevinlin311tw)'s repo [keras-openpose-reproduce](https://github.com/kevinlin311tw/keras-openpose-reproduce), [@anatolix](https://github.com/anatolix)'s repo [keras_Realtime_Multi-Person_Pose_Estimation](https://github.com/anatolix/keras_Realtime_Multi-Person_Pose_Estimation), and [@michalfaber](https://github.com/michalfaber)'s repo [keras_Realtime_Multi-Person_Pose_Estimation](https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation)
 
 
 ## Citation
-
-Please cite the paper in your publications if it helps your research:
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
@@ -98,3 +162,17 @@ Please cite the paper in your publications if it helps your research:
       title = {Convolutional pose machines},
       year = {2016}
       }
+
+
+
+
+
+Difficult detection cases by original dataset annotations: 
+difficult joints: knees & ankles & hips [Rhip, Rkne, Rank, Lhip, Lkne, Lank]
+crowded: multi-person in proximityDifficult detection cases with complex images by my own annotations (according to visual perception and human intelligence):
+deformation: weird, deformed and not elegant pose with negative sentiment
+rare and novel poses: interesting or funny pose with positive sentiment. (Poses that are rare in dataset pose distribution and it might be hard for a person to stay in this pose for long.)
+complex/crowded background: not clear background, not pronounced entity, not blurred background, many (in terms of quantity and categories) objectsDifficult detection cases with low quality image
+low resolution: half the width and half the height of original images
+motion blur: add horizontal motion blur to images
+low lightning: lower image brightness

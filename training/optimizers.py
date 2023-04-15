@@ -1,6 +1,6 @@
-from keras.optimizers import Optimizer
+from tensorflow.keras.optimizers import Optimizer
 from keras import backend as K
-from keras.legacy import interfaces
+# from keras.legacy import interfaces
 
 
 class MultiSGD(Optimizer):
@@ -30,7 +30,7 @@ class MultiSGD(Optimizer):
         self.nesterov = nesterov
         self.lr_mult = lr_mult
 
-    @interfaces.legacy_get_updates_support
+    # @interfaces.legacy_get_updates_support
     def get_updates(self, loss, params):
         grads = self.get_gradients(loss, params)
         self.updates = [K.update_add(self.iterations, 1)]

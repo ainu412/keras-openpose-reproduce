@@ -1,0 +1,18 @@
+,evaluation_metrics,value
+0,(AP) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.3346987585477351
+1,(AP) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.5717779568821314
+2,(AP) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.327689232762677
+3,(AP) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.5186545754146035
+4,(AP) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.39859228436488364
+5,(AR) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.39696745562130176
+6,(AR) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.6035502958579881
+7,(AR) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.40458579881656803
+8,(AR) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.555848434925865
+9,(AR) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.6711538461538461
+10,prediction time,11319.503849744797
+11,PCK@0.5 all keypoints,0.7833146681909021
+12,PCK@0.5 difficult keypoints,0.6805369097067699
+13,PCK@0.5 crowded images,0.8306877867360959
+14,PCK@0.5 deformation images,0.7671232613998884
+15,PCK@0.5 rare pose images,0.7890562982628366
+16,PCK@0.5 crowded background images,0.7913832020094512

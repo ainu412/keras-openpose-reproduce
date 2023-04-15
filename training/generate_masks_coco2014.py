@@ -5,17 +5,19 @@ import os
 import cv2
 import numpy as np
 from pycocotools.coco import COCO
+import argparse
 
-def preproc(mode):
+def preproc(mode, effect):
     
-    dataset_dir = '/data/dataset'#os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'dataset'))
+    dataset_dir = '../dataset'#os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'dataset'))
 
-    val_anno_path = os.path.join(dataset_dir, "cocoapi/annotations/person_keypoints_%s2014.json" % mode)
-    val_images_dir = os.path.join(dataset_dir, "%s2014" % mode)
-    val_masks_dir = os.path.join(dataset_dir, "%smask2014" % mode)
+    val_anno_path = os.path.join(dataset_dir, "annotations/person_keypoints_%s2014.json" % mode)
+
+    val_images_dir = os.path.join(dataset_dir, "%s2014%s" % (mode, effect))
+    val_masks_dir = os.path.join(dataset_dir, "%smask2014%s" % (mode, effect))
 
     if not os.path.exists(val_masks_dir):
-        os.makedirs(val_masks_dir)
+        os.mkdir(val_masks_dir)
 
     coco = COCO(val_anno_path)
     ids = list(coco.imgs.keys())
@@ -69,5 +71,9 @@ def preproc(mode):
 
 
 if __name__ == '__main__':
-    preproc('train')
-    preproc('val')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--effect', type=str, default='', help='_dark or _motion_blur')
+    args = parser.parse_args()
+
+    preproc('train', args.effect)
+    preproc('val', args.effect)
