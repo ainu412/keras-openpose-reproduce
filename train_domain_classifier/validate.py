@@ -93,12 +93,13 @@ def validate(network, validation_set):
 
     return avg_loss, avg_acc
 
+# effect: "", ""
 def model_predict_json(network, effect):
     network.eval()
 
     predict_list = []
-    img_dir = '../dataset/val2014%s/' % effect
-    results_path = 'results/val2014%s.json' % effect
+    img_dir = '../dataset/frames%s/' % effect
+    results_path = 'results/frames%s.json' % effect
 
     transform = Compose([
         Resize((112, 112)),
@@ -108,7 +109,7 @@ def model_predict_json(network, effect):
 
     with torch.no_grad():
         for name in os.listdir(img_dir):
-            image_id = int(name[-16:-4])
+            image_id = name[:-4]
             image = transform(Image.open(img_dir + name).convert('RGB')).unsqueeze(0).cuda()
             effect_prob = network(image)
             dic = {'image_id': image_id, 'effect_prob': list(effect_prob.cpu().numpy())[0]}
@@ -117,9 +118,7 @@ def model_predict_json(network, effect):
     with open(results_path, 'w') as f:
         json.dump(predict_list, f, cls=NpEncoder)
 
-
-
-if __name__ == '__main__':
+def model_evaluate():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     weight_path = './log/2023-04-08_12-40/checkpoints/model_{epoch+1:04d}.pth'
@@ -136,5 +135,15 @@ if __name__ == '__main__':
     })
     df.to_csv(weight_path[:-4] + '.csv')
     print(df)
+
+if __name__ == '__main__':
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    weight_path = './log/2023-04-08_12-40/checkpoints/model_{epoch+1:04d}.pth'
+    model = INet().to(device)
+    checkpoint = torch.load(weight_path, map_location=device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+
+    model_predict_json(model, "_dark")
 
     # model_predict_json(model, "_random1k_resolution")

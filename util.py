@@ -1,7 +1,10 @@
+import os
+
 import numpy as np
 from io import StringIO
 import PIL.Image
 from IPython.display import Image, display
+import shutil
 
 def showBGRimage(a, fmt='jpeg'):
     a = np.uint8(np.clip(a, 0, 255))
@@ -75,3 +78,11 @@ def padRightDownCorner(img, stride, padValue):
     img_padded = np.concatenate((img_padded, pad_right), axis=1)
 
     return img_padded, pad
+
+def video_process():
+    for img_name in os.listdir('dataset/frames'):
+        shutil.copyfile('dataset/frames/%s' % (img_name),
+                            'dataset/frames0/%s.jpg' % (img_name[:-4]))
+
+if __name__ == '__main__':
+    video_process()

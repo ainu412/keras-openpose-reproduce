@@ -1,18 +1,18 @@
 ,evaluation_metrics,value
-0,(AP) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.04463289688275047
-1,(AP) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.15542615508723687
-2,(AP) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.01706162097547599
-3,(AP) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.016975918915420954
-4,(AP) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.08537799633186031
-5,(AR) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.06804733727810651
-6,(AR) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.20192307692307693
-7,(AR) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.034023668639053255
-8,(AR) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.015601023017902815
-9,(AR) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.14035087719298248
-10,prediction time,15411.434897184372
-11,PCK@0.5 all keypoints,0.6998359721168071
-12,PCK@0.5 difficult keypoints,0.5874673552549954
-13,PCK@0.5 crowded images,0.7425149255979087
-14,PCK@0.5 deformation images,0.6869564620037859
-15,PCK@0.5 rare pose images,0.7453987501411427
+0,(AP) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.044
+1,(AP) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.155
+2,(AP) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.017
+3,(AP) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.016
+4,(AP) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.085
+5,(AR) @[ OKS=0.50:0.95 | area=   all | maxDets= 20 ],0.068
+6,(AR) @[ OKS=0.50      | area=   all | maxDets= 20 ],0.201
+7,(AR) @[ OKS=0.75      | area=   all | maxDets= 20 ],0.034
+8,(AR) @[ OKS=0.50:0.95 | area=medium | maxDets= 20 ],0.015
+9,(AR) @[ OKS=0.50:0.95 | area= large | maxDets= 20 ],0.140
+10,prediction time,15411
+11,PCK@0.5 all keypoints,0.699
+12,PCK@0.5 difficult keypoints,0.587
+13,PCK@0.5 crowded images,0.742
+14,PCK@0.5 deformation images,0.686
+15,PCK@0.5 rare pose images,0.745
 16,PCK@0.5 crowded background images,0.6967741485952162

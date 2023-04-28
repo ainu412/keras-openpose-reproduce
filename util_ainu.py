@@ -91,9 +91,9 @@ def half_resolution_dataset_annotation():
 
 
 def motion_blur_dataset():
-    dir = 'dataset/val2014/'
+    dir = 'dataset/frames/'
     fileNames = os.listdir(dir)
-    tar_dir = 'dataset/val2014_classifier/'
+    tar_dir = 'dataset/frames_motion_blur/'
     if not os.path.exists(tar_dir):
         os.mkdir(tar_dir)
     for name in fileNames:
@@ -123,13 +123,13 @@ def motion_blur_dataset():
         horizonal_mb = cv2.filter2D(img, -1, kernel_h)
         # Save the outputs.
         # cv2.imwrite('car_vertical.jpg', vertical_mb)
-        cv2.imwrite(tar_dir + name[:-4] + '_motion_blur' + '.jpg', horizonal_mb)
+        cv2.imwrite(tar_dir + name[:-4] + '_motion_blur' + '.png', horizonal_mb)
 
 
 def dark_dataset():
-    dir = 'dataset/val2014/'
+    dir = 'dataset/frames/'
     fileNames = os.listdir(dir)
-    tar_dir = 'dataset/val2014_classifier/'
+    tar_dir = 'dataset/frames_dark/'
     if not os.path.exists(tar_dir):
         os.mkdir(tar_dir)
     for name in fileNames:
@@ -265,7 +265,7 @@ def compute_transl_rotate_disagreement(data_type):
 
 def ensemble_uncertainty_quantification():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--coco_dataType', type=str, default='val2014_random1k_resolution',
+    parser.add_argument('--coco_dataType', type=str, default='val2014_random1k',
                         help='val2014_random1k or val2014_random1k_resolution or val2014_random1k_motion_blur'
                              'or val2014_random1k_dark')
     args = parser.parse_args()
@@ -301,6 +301,8 @@ if __name__ == '__main__':
 
     # half_resolution()
     # half_resolution_dataset_annotation()
-    # motion_blur_dataset()
-    ensemble_uncertainty_quantification()
+    motion_blur_dataset()
+    dark_dataset()
+
+    # ensemble_uncertainty_quantification()
 

@@ -307,7 +307,10 @@ def compute_keypoints(model_weights_file, cocoGt, output_folder, coco_data_type,
 
     for item in imgIds:
         # load image fname
-        fname = cocoGt.imgs[item]['file_name']
+        if cocoGt is None:
+            fname = item
+        else:
+            fname = cocoGt.imgs[item]['file_name']
         input_fname = '../dataset/%s/%s' % (coco_data_type, fname)
         print(input_fname)
         print('Image file exist? %s' % os.path.isfile(input_fname))
@@ -396,7 +399,7 @@ def write_json(candidate_set, subset_set, image_id_set, json_file):
 
                 # score = score/valid_parts_num.astype(float)
                 score = subset_set[i][person][-2]
-                json_dict = {"image_id": image_id_set[i], "category_id": category_id, "keypoints": keypoints,
+                json_dict = {"image_id": image_id_set[i][:-4], "category_id": category_id, "keypoints": keypoints,
                              "score": score, "score_list": score_li, "keypoints_with_neck": keypoints_with_neck,
                              "body_link_list": body_link_list}
                 output_data.append(json_dict)
@@ -565,14 +568,14 @@ def run_eval_metric(cocoGt, prediction_json, coco_dataType, total_time, full_eva
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     epoch_num = 100
-    parser.add_argument('--effect', type=str, default="", help='model weight load, _dark or _motion_blur or _ensemble')
-    parser.add_argument('--coco_dataType', '-dt', type=str, default='val2014_random1k_motion_blur',
+    parser.add_argument('--effect', type=str, default="_motion_blur", help='model weight load, _dark or _motion_blur or _ensemble')
+    parser.add_argument('--coco_dataType', '-dt', type=str, default='frames_motion_blur',
                         help='val2014 or val2014_random1k or val2014_random1k_dark or val2014_random1k_motion_blur'
-                             'or val2014_random1k_resolution')
-    parser.add_argument('--fir_img_num', type=int, default=1000, help='validate on first __ images,'
-                                                                    'if <0 means all images')
-    parser.add_argument('--compute_keypoint', type=bool, default=False, help='let model predict keypoint or not')
-    parser.add_argument('--eval_compute_keypoint', type=bool, default=True,
+                             'or val2014_random1k_resolution or video_frames_less1mb')
+    parser.add_argument('--fir_img_num', type=int, default=200, help='validate on first __ images,'
+                                                                    'if -1 means all images')
+    parser.add_argument('--compute_keypoint', type=bool, default=True, help='let model predict keypoint or not')
+    parser.add_argument('--eval_compute_keypoint', type=bool, default=False,
                         help='evaluate model predicted keypoint or not')
 
     args = parser.parse_args()
@@ -585,8 +588,10 @@ if __name__ == '__main__':
     keras_weights_file = '../training/weights%s/weights.%04d.h5' % (args.effect, epoch_num)
 
     # initialize COCO ground truth api
-    annFile = ('../dataset/annotations/%s_%s.json' % (prefix, args.coco_dataType))
-    cocoGt = COCO(annFile)
+    cocoGt = None
+    if not 'frames' in args.coco_dataType:
+        annFile = ('../dataset/annotations/%s_%s.json' % (prefix, args.coco_dataType))
+        cocoGt = COCO(annFile)
     tic = time.time()
 
     # configure img_ids
@@ -603,6 +608,11 @@ if __name__ == '__main__':
 
                 # add current item to the list
                 img_id.append(int(x))
+
+    if 'frames' in args.coco_dataType:
+        img_id = []
+        for file_names in os.listdir('../dataset/%s' % args.coco_dataType):
+            img_id.append(file_names)
 
     # eval model
     mode_name = 'open-pose-single-scale'

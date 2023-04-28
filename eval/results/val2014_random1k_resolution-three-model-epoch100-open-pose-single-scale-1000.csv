@@ -1,37 +1,37 @@
-,evaluation_metrics,value
-0,transl disagreement neck to Rsho ,1.428
-1,transl disagreement neck to Lsho ,2.322
-2,transl disagreement Rsho to Relb ,0.689
-3,transl disagreement Relb to Rwri ,1.569
-4,transl disagreement Lsho to Lelb ,1.188
-5,transl disagreement Lelb to Lwri ,0.638
-6,transl disagreement neck to Rhip ,1.716
-7,transl disagreement Rhip to Rkne ,1.530
-8,transl disagreement Rkne to Rank ,3.471
-9,transl disagreement neck to Lhip ,2.811
-10,transl disagreement Lhip to Lkne ,0.884
-11,transl disagreement Lkne to Lank ,0.654
-12,transl disagreement neck to nose ,0.472
-13,transl disagreement nose to Leye ,2.148
-14,transl disagreement Leye to Lear ,2.264
-15,transl disagreement nose to Reye ,1.706
-16,transl disagreement Reye to Rear ,1.826
-17,rotate disagreement neck to Rsho ,0.082
-18,rotate disagreement neck to Lsho ,0.096
-19,rotate disagreement Rsho to Relb ,0.067
-20,rotate disagreement Relb to Rwri ,0.123
-21,rotate disagreement Lsho to Lelb ,0.089
-22,rotate disagreement Lelb to Lwri ,0.066
-23,rotate disagreement neck to Rhip ,0.140
-24,rotate disagreement Rhip to Rkne ,0.069
-25,rotate disagreement Rkne to Rank ,0.185
-26,rotate disagreement neck to Lhip ,0.249
-27,rotate disagreement Lhip to Lkne ,0.105
-28,rotate disagreement Lkne to Lank ,0.099
-29,rotate disagreement neck to nose ,0.000
-30,rotate disagreement nose to Leye ,0.253
-31,rotate disagreement Leye to Lear ,0.421
-32,rotate disagreement nose to Reye ,0.294
-33,rotate disagreement Reye to Rear ,0.398
-34,total transl disagreement,27.316
-35,total rotate disagreement,2.737
+ & evaluation_metrics & value                  \\
+0 & transl disagreement neck to Rsho  & 0.851  & 1.428  \\
+1 & transl disagreement neck to Lsho  & 2.438  & 2.322  \\
+2 & transl disagreement Rsho to Relb  & 0.995  & 0.689  \\
+3 & transl disagreement Relb to Rwri  & 1.577  & 1.569  \\
+4 & transl disagreement Lsho to Lelb  & 0.432  & 1.188  \\
+5 & transl disagreement Lelb to Lwri  & 0.363  & 0.638  \\
+6 & transl disagreement neck to Rhip  & 1.731  & 1.716  \\
+7 & transl disagreement Rhip to Rkne  & 2.445  & 1.530  \\
+8 & transl disagreement Rkne to Rank  & 3.826  & 3.471  \\
+9 & transl disagreement neck to Lhip  & 3.371  & 2.811  \\
+10 & transl disagreement Lhip to Lkne  & 0.822  & 0.884 \\
+11 & transl disagreement Lkne to Lank  & 0.685  & 0.654 \\
+12 & transl disagreement neck to nose  & 0.211  & 0.472 \\
+13 & transl disagreement nose to Leye  & 1.723  & 2.148 \\
+14 & transl disagreement Leye to Lear  & 1.660  & 2.264 \\
+15 & transl disagreement nose to Reye  & 1.584  & 1.706 \\
+16 & transl disagreement Reye to Rear  & 1.663  & 1.826 \\
+17 & rotate disagreement neck to Rsho  & 0.062  & 0.082 \\
+18 & rotate disagreement neck to Lsho  & 0.060  & 0.096 \\
+19 & rotate disagreement Rsho to Relb  & 0.045  & 0.067 \\
+20 & rotate disagreement Relb to Rwri  & 0.084  & 0.123 \\
+21 & rotate disagreement Lsho to Lelb  & 0.044  & 0.089 \\
+22 & rotate disagreement Lelb to Lwri  & 0.039  & 0.066 \\
+23 & rotate disagreement neck to Rhip  & 0.142  & 0.140 \\
+24 & rotate disagreement Rhip to Rkne  & 0.079  & 0.069 \\
+25 & rotate disagreement Rkne to Rank  & 0.139  & 0.185 \\
+26 & rotate disagreement neck to Lhip  & 0.180  & 0.249 \\
+27 & rotate disagreement Lhip to Lkne  & 0.098  & 0.105 \\
+28 & rotate disagreement Lkne to Lank  & 0.070  & 0.099 \\
+29 & rotate disagreement neck to nose  & 0.000  & 0.000 \\
+30 & rotate disagreement nose to Leye  & 0.202  & 0.253 \\
+31 & rotate disagreement Leye to Lear  & 0.343  & 0.421 \\
+32 & rotate disagreement nose to Reye  & 0.157  & 0.294 \\
+33 & rotate disagreement Reye to Rear  & 0.379  & 0.398 \\
+34 & total transl disagreement & 26.377 & 27.316        \\
+35 & total rotate disagreement & 2.123  & 2.737         \\
